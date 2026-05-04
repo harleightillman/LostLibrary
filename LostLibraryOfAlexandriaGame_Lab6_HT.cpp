@@ -11,195 +11,190 @@ struct Player {
     string name;
     int health;
     int knowledge;
+    int roomsExplored; // Tracked for final report[cite: 1]
     bool isAlive;
+    bool encountered[5]; // Ensures unique random encounters[cite: 2]
 };
 
-// ============================================================================
-// CONCEPT: PASS BY VALUE
-// Explanation: Here, 'p' is a brand-new copy of the player. If we change 
-// p.health inside this function, the original player back in main() 
-// remains unchanged. This is great for "read-only" tasks.
-// ============================================================================
+// --- Function Prototypes ---
+void viewStats(Player p);
+void exploreRoom(Player& p);
+void handleRandomEncounter(Player& p);
+void saveGame(Player p);
+void loadGame(Player& p);
+void endGameReport(Player p);
+
+// --- Implementation ---
+
 void viewStats(Player p) {
     cout << "\n--- PLAYER STATS ---" << endl;
-    cout << " Name:      " << p.name << endl;
-    cout << " Health:    " << p.health << endl;
-    cout << " Knowledge: " << p.knowledge << endl;
+    cout << " Name:           " << p.name << endl;
+    cout << " Health:         " << p.health << endl;
+    cout << " Knowledge:      " << p.knowledge << endl;
+    cout << " Rooms Explored: " << p.roomsExplored << endl;
     cout << "--------------------" << endl;
 }
 
-// ============================================================================
-// CONCEPT: PASS BY REFERENCE (&)
-// Explanation: The '&' means we are working with the ACTUAL player from main().
-// If the player hits a trap and we subtract health, it stays subtracted.
-// Without the '&', the player would be invincible because we'd only
-// be damaging a temporary copy.
-// ============================================================================
+void handleRandomEncounter(Player& p) {
+    int available[5];
+    int count = 0;
+
+    // Filter for encounters not yet seen[cite: 2]
+    for (int i = 0; i < 5; i++) {
+        if (!p.encountered[i]) {
+            available[count] = i;
+            count++;
+        }
+    }
+
+    if (count == 0) {
+        cout << "\n [!] You feel a sense of deja vu. This part of the library is familiar." << endl;
+        return;
+    }
+
+    int pick = available[rand() % count];
+    p.encountered[pick] = true;
+    int choice;
+
+    cout << "\n [???] UNIQUE ENCOUNTER [???]" << endl;
+
+    // Scenarios based on user input
+    switch (pick) {
+    case 0: // Scriptorium's Whisper
+        cout << "A voice promises a secret from a cracked codex.\n 1. Read aloud\n 2. Pocket a folio\n 3. Leave it\n Choice: ";
+        cin >> choice;
+        if (choice == 1) { cout << " Outcome: Knowledge +15."; p.knowledge += 15; }
+        else if (choice == 2) { cout << " Outcome: Cursed! Health -20."; p.health -= 20; }
+        else cout << " Outcome: You find only dust.";
+        break;
+    case 1: // Mosaic Guardian
+        cout << "A mosaic guardian offers a riddle.\n 1. Solve riddle\n 2. Strike it\n 3. Step around\n Choice: ";
+        cin >> choice;
+        if (choice == 1) { cout << " Outcome: Restorative oil! Health +15."; p.health += 15; }
+        else if (choice == 2) { cout << " Outcome: Shard barrage! Health -15."; p.health -= 15; }
+        else { cout << " Outcome: You overheard a clue. Knowledge +10."; p.knowledge += 10; }
+        break;
+    case 2: // Librarian's Echo
+        cout << "A spirit asks for help cataloging.\n 1. Help spirit\n 2. Grab and run\n 3. Decline\n Choice: ";
+        cin >> choice;
+        if (choice == 1) { cout << " Outcome: Lost scholarship! Knowledge +20."; p.knowledge += 20; }
+        else if (choice == 2) { cout << " Outcome: Vitality drained! Health -15."; p.health -= 15; }
+        else cout << " Outcome: The spirit ignores you.";
+        break;
+    case 3: // Alabaster Fountain
+        cout << "A fountain bubbles with luminous water.\n 1. Drink\n 2. Collect vial\n 3. Test on paper\n Choice: ";
+        cin >> choice;
+        if (choice == 1) { cout << " Outcome: Wounds mended! Health +20."; p.health += 20; }
+        else if (choice == 2) { cout << " Outcome: The vial is inert."; }
+        else { cout << " Outcome: Invisible script revealed! Knowledge +15."; p.knowledge += 15; }
+        break;
+    case 4: // Stairs of Unmaking
+        cout << "A statue clutches a bronze key.\n 1. Take key\n 2. Repair statue\n 3. Leave\n Choice: ";
+        cin >> choice;
+        if (choice == 1) { cout << " Outcome: You found a map! Knowledge +20."; p.knowledge += 20; }
+        else if (choice == 2) { cout << " Outcome: Statue's blessing! Health +10."; p.health += 10; }
+        else { cout << " Outcome: Trapdoor! You tumble. Health -20."; p.health -= 20; }
+        break;
+    }
+    cout << endl;
+    if (p.health > 100) p.health = 100;
+    cin.ignore(1000, '\n'); // Buffer fix[cite: 2]
+}
+
 void exploreRoom(Player& p) {
-    int event = rand() % 3 + 1;
+    p.roomsExplored++;
+    string traps[] = { "Darts fly from walls!", "A pit trap opens!", "A shelf topples!" };
+    string scrolls[] = { "You find a star map.", "You read a lost history.", "A scroll reveals a secret." };
+    string herbs[] = { "You find dried aloe.", "You eat a blue berry.", "Soothing incense heals you." };
+
+    int event = rand() % 4 + 1; // 1-3 standard, 4 random encounter[cite: 2]
 
     if (event == 1) {
-        cout << "\n [!] A trap was triggered! You lost 15 health." << endl;
+        cout << "\n [!] " << traps[rand() % 3] << " Health -15." << endl;
         p.health -= 15;
-        // Immediate feedback after the change
-        cout << " Current Health: " << p.health << endl;
     }
     else if (event == 2) {
-        cout << "\n [+] You found an ancient scroll! Knowledge +10." << endl;
+        cout << "\n [+] " << scrolls[rand() % 3] << " Knowledge +10." << endl;
         p.knowledge += 10;
-        // Immediate feedback after the change
-        cout << " Total Knowledge: " << p.knowledge << endl;
     }
-    else {
-        cout << "\n [+] You found a medicinal herb! Health +10." << endl;
+    else if (event == 3) {
+        cout << "\n [+] " << herbs[rand() % 3] << " Health +10." << endl;
         p.health += 10;
         if (p.health > 100) p.health = 100;
-        // Immediate feedback after the change
-        cout << " Current Health: " << p.health << endl;
+    }
+    else {
+        handleRandomEncounter(p);
     }
 
-    if (p.health <= 0) {
-        p.isAlive = false;
-        cout << " !!! Your health has failed you... " << endl;
-    }
+    cout << " Status -> Health: " << p.health << " | Knowledge: " << p.knowledge << endl;
+    if (p.health <= 0) p.isAlive = false;
 }
 
-// NOTE: We pass 'p' by value here because we only need to read the data to save it.
 void saveGame(Player p) {
     ofstream outFile("savegame.txt");
-
     if (outFile.is_open()) {
-        outFile << p.name << endl;
-        outFile << p.health << endl;
-        outFile << p.knowledge << endl;
+        outFile << p.name << endl << p.health << endl << p.knowledge << endl << p.roomsExplored << endl;
+        for (int i = 0; i < 5; i++) outFile << p.encountered[i] << " ";
         outFile.close();
-        cout << " Game saved successfully." << endl;
-    }
-    else {
-        cout << " Error: Could not create save file." << endl;
+        cout << " Game saved." << endl;
     }
 }
 
-// NOTE: We pass 'p' by reference because we are OVERWRITING the current 
-// player stats with the data found in the file.
 void loadGame(Player& p) {
     ifstream inFile("savegame.txt");
-
     if (inFile.is_open()) {
         getline(inFile, p.name);
-        inFile >> p.health;
-        inFile >> p.knowledge;
+        inFile >> p.health >> p.knowledge >> p.roomsExplored;
+        for (int i = 0; i < 5; i++) inFile >> p.encountered[i];
         inFile.close();
-        cout << " Game loaded! Welcome back, " << p.name << "." << endl;
+        cout << " Game loaded! Welcome, " << p.name << "." << endl;
     }
-    else {
-        cout << " No save file found." << endl;
-    }
+    else cout << " No save found." << endl;
 }
 
 void endGameReport(Player p) {
-    cout << "\n-------- Final Player Results --------" << endl;
+    cout << "\n--- FINAL REPORT ---" << endl;
+    cout << " Rooms Explored:  " << p.roomsExplored << endl;
     cout << " Final Health:    " << p.health << endl;
     cout << " Total Knowledge: " << p.knowledge << endl;
-
-    if (p.health <= 0) {
-        cout << " Result: You perished in the library ruins." << endl;
-    }
-    else if (p.knowledge >= 50) {
-        cout << " Result: You escaped with the secrets of the ancient world!" << endl;
-    }
-    else {
-        cout << " Result: You left the library early." << endl;
-    }
-    cout << "------------------------------" << endl;
+    if (p.health <= 0) cout << " Result: PERISHED" << endl;
+    else if (p.knowledge >= 50) cout << " Result: ESCAPED WITH SECRETS" << endl;
+    else cout << " Result: LEFT EARLY" << endl;
 }
 
 int main() {
-    // Initialize Variables
-    Player explorer;
-    int menuChoice;
-    char userResponse;
-    bool gameChoice = false;
-    bool validMenuInput;
-    bool exitFlag;
-
     srand(static_cast<unsigned int>(time(0)));
+    Player explorer;
+    int choice;
+    bool playAgain;
 
-    // Do-while loop for entire program repetition
     do {
-        exitFlag = false;
-        explorer.health = 100;
-        explorer.knowledge = 0;
-        explorer.isAlive = true;
+        explorer.health = 100; explorer.knowledge = 0; explorer.roomsExplored = 0; explorer.isAlive = true;
+        for (int i = 0; i < 5; i++) explorer.encountered[i] = false;
 
-        cout << "-------- Lost Library of Alexandria --------" << endl;
-        cout << "Enter your explorer's name: ";
-        getline(cin, explorer.name);
+        cout << "--- Lost Library of Alexandria ---" << endl;
+        cout << "Name: "; getline(cin, explorer.name);
 
-        // Main Gameplay Loop
+        bool exitFlag = false;
         while (explorer.isAlive && !exitFlag) {
-            cout << "\n--- Main Menu ---" << endl;
-            cout << " 1. Explore Room" << endl;
-            cout << " 2. View Stats" << endl;
-            cout << " 3. Save Game" << endl;
-            cout << " 4. Load Game" << endl;
-            cout << " 5. Exit" << endl;
-            cout << " Choice: ";
+            cout << "\n1.Explore 2.Stats 3.Save 4.Load 5.Exit\nChoice: ";
+            if (!(cin >> choice)) { cin.clear(); cin.ignore(1000, '\n'); continue; }
 
-            // Input Validation Loop
-            validMenuInput = false;
-            while (!validMenuInput) {
-                if (cin >> menuChoice) {
-                    if (menuChoice >= 1 && menuChoice <= 5) {
-                        validMenuInput = true;
-                    }
-                    else {
-                        cout << " Invalid choice. Please enter 1-5: ";
-                    }
-                }
-                else {
-                    cout << " Invalid input. Please enter a number: ";
-                    cin.clear();
-                    cin.ignore(1000, '\n');
-                }
-            }
-
-            // Route user choices to functions
-            if (menuChoice == 1) {
+            if (choice == 1) {
                 exploreRoom(explorer);
                 if (explorer.knowledge >= 50) exitFlag = true;
             }
-            else if (menuChoice == 2) viewStats(explorer);
-            else if (menuChoice == 3) saveGame(explorer);
-            else if (menuChoice == 4) loadGame(explorer);
-            else if (menuChoice == 5) exitFlag = true;
+            else if (choice == 2) viewStats(explorer);
+            else if (choice == 3) saveGame(explorer);
+            else if (choice == 4) { cin.ignore(); loadGame(explorer); }
+            else if (choice == 5) exitFlag = true;
         }
 
         endGameReport(explorer);
+        cout << "Play again? (y/n): ";
+        char resp; cin >> resp; cin.ignore(1000, '\n');
+        playAgain = (resp == 'y' || resp == 'Y');
+    } while (playAgain);
 
-        // Check if the user wants to play again
-        bool validUserResponse = false;
-        while (!validUserResponse) {
-            cout << " Do you want to play again? (y/n): ";
-            cin >> userResponse;
-
-            if (userResponse == 'y' || userResponse == 'Y') {
-                gameChoice = true;
-                validUserResponse = true;
-                cin.ignore(1000, '\n');
-                cout << endl << endl;
-            }
-            else if (userResponse == 'n' || userResponse == 'N') {
-                gameChoice = false;
-                validUserResponse = true;
-            }
-            else {
-                cout << " Invalid response. Please enter 'y' or 'n'." << endl;
-            }
-        }
-
-    } while (gameChoice == true);
-
-    cout << " Program now exiting." << endl;
     return 0;
 }

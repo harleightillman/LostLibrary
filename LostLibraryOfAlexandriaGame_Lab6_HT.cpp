@@ -1,22 +1,26 @@
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <cstdlib>
-#include <ctime>
+#include <iostream>  // Handles standard input and output (cin/cout)
+#include <string>    // Allows us to use the string data type for names and narrative text
+#include <fstream>   // Gives us the ability to read from and write to external files
+#include <cstdlib>   // Contains functions like rand() and srand() for randomization
+#include <ctime>     // Used to get the system time for a truly random seed
 
 using namespace std;
 
-// --- Struct Definition ---
+// --- STEP 1: THE PLAYER BLUEPRINT ---
+// We use a struct to group different data types (strings, ints, bools) 
+// together into one "Player" object. This is much cleaner than passing 
+// six separate variables into every function[cite: 3].
 struct Player {
     string name;
     int health;
     int knowledge;
     int roomsExplored;
     bool isAlive;
-    bool encountered[5];
+    bool encountered[5]; // An array of booleans to track which special encounters the player has seen[cite: 3]
 };
 
 // --- Function Prototypes ---
+// These tell the compiler "these functions exist, but I'll define the details later"[cite: 3].
 void viewStats(Player p);
 void exploreRoom(Player& p);
 void handleRandomEncounter(Player& p);
@@ -27,16 +31,22 @@ int getValidChoice(int min, int max);
 
 // --- Implementation ---
 
+/* 
+   STEP 2: INPUT VALIDATION (THE "FIREWALL")
+   Why: If a user types "abc" when the program expects a number, C++ can enter 
+   an infinite loop error state. This function prevents that by clearing 
+   the error and forcing the user to pick a valid number[cite: 3].
+*/
 int getValidChoice(int min, int max) {
     int choice;
     while (true) {
         if (cin >> choice && choice >= min && choice <= max) {
-            cin.ignore(1000, '\n');
+            cin.ignore(1000, '\n'); // Clear the rest of the line
             return choice;
         }
         cout << " [!] Invalid entry. Please enter a choice between " << min << " and " << max << ": ";
-        cin.clear();
-        cin.ignore(1000, '\n');
+        cin.clear();           // Reset the error flag on the input stream
+        cin.ignore(1000, '\n'); // Discard the invalid characters in the buffer
     }
 }
 
@@ -49,6 +59,12 @@ void viewStats(Player p) {
     cout << "--------------------" << endl;
 }
 
+/* 
+   STEP 3: UNIQUE EVENT LOGIC
+   Why: We don't want the player to see the same "Special Encounter" twice.
+   How: We look through the 'encountered' array to find which events are still 'false', 
+   put those indexes into a temporary 'available' array, and pick from that[cite: 3].
+*/
 void handleRandomEncounter(Player& p) {
     int available[5];
     int count = 0;
@@ -66,7 +82,7 @@ void handleRandomEncounter(Player& p) {
     }
 
     int pick = available[rand() % count];
-    p.encountered[pick] = true;
+    p.encountered[pick] = true; // Mark this specific encounter as "completed"[cite: 3]
     int choice;
 
     cout << "\n [???] SPECIAL ENCOUNTER [???]" << endl;
@@ -180,24 +196,29 @@ void handleRandomEncounter(Player& p) {
         }
         else {
             cout << " Outcome: You brace yourself and descend step by step, fighting the staircase’s shifting angles. It’s slow, awkward, and exhausting, but you reach the bottom without injury or discovery. Nothing happens.";
-            // No stat change
         }
         break;
 
     }
     cout << endl;
-    if (p.health > 100) p.health = 100;
+    if (p.health > 100) p.health = 100; // Ensures health never exceeds the 100-point maximum[cite: 3]
 }
 
+/* 
+   STEP 4: PROCEDURAL NARRATIVE
+   Why: This makes the library feel infinite without writing infinite code. 
+   How: By using arrays of strings, we can randomly select one out of ten 
+   descriptions every time the player "Explores"[cite: 3].
+*/
 void exploreRoom(Player& p) {
     p.roomsExplored++;
 
-    // Generalized events (10 scenarios each) - Expanded with more narrative detail[cite: 3]
+    // Generalized events (10 scenarios each)
     string danger_event[] = {
         "You hear a sharp metallic click as your boot depresses a stone tile. A barrage of poison-tipped darts whistles through the air from hidden slits, grazing your skin.",
         "The stone floor beneath you suddenly groans and vanishes into darkness. You tumble into a shallow pit lined with jagged pottery shards that tear into your gear and skin.",
         "A massive, dust-caked bookshelf shifts and topples with a thunderous roar. You barely roll aside as it crashes, but a heavy wooden beam strikes your shoulder.",
-        "A nearly invisible tripwire snaps across your path. A rusted pendulum blade swings from the ceiling, its serrated edge slicing through your clothes and leaving a stinging wound.",
+        "A nearly invisible tripwire snaps across your path. A rusted pendulum blade swings from the ceiling, its serrated edge slicing through your tunic and leaving a stinging wound.",
         "As you pass under a crumbling arch, a massive stone block detaches and plummets. The resulting shockwave and debris spray you with sharp, stinging stone fragments.",
         "A hiss fills the air as a hidden nozzle sprays a thick, caustic vapor. The stinging mist burns your eyes and throat, forcing you to stagger back in pain.",
         "You disturb a patch of pulsating, iridescent mold on a damp wall. A cloud of toxic spores erupts, choking you and leaving you lightheaded and nauseous.",
@@ -230,22 +251,23 @@ void exploreRoom(Player& p) {
         "A sudden, crisp draft of fresh air flows down from a high ventilation shaft. Inhaling the clean breeze restores your stamina and clears the dust from your lungs."
     };
 
+    // This logic roll decides which of the four paths the room takes[cite: 3]
     int event = rand() % 4 + 1;
 
-    if (event == 1) {
+    if (event == 1) { // 25% chance of danger
         cout << "\n [!] " << danger_event[rand() % 10] << " Health -15." << endl;
         p.health -= 15;
     }
-    else if (event == 2) {
+    else if (event == 2) { // 25% chance of knowledge
         cout << "\n [+] " << knowledge_event[rand() % 10] << " Knowledge +10." << endl;
         p.knowledge += 10;
     }
-    else if (event == 3) {
+    else if (event == 3) { // 25% chance of health
         cout << "\n [+] " << health_event[rand() % 10] << " Health +10." << endl;
         p.health += 10;
         if (p.health > 100) p.health = 100;
     }
-    else {
+    else { // 25% chance of the unique "Special Encounters"
         handleRandomEncounter(p);
     }
 
@@ -253,6 +275,11 @@ void exploreRoom(Player& p) {
     if (p.health <= 0) p.isAlive = false;
 }
 
+/* 
+   STEP 5: DATA PERSISTENCE (SAVE/LOAD)
+   How: We use ofstream (output file stream) and ifstream (input file stream) 
+   to write the struct data to a plain text file on the hard drive[cite: 3].
+*/
 void saveGame(Player p) {
     ofstream outFile("SaveGame.txt");
     if (outFile.is_open()) {
@@ -275,6 +302,11 @@ void loadGame(Player& p) {
     else cout << " No SaveGame.txt found." << endl;
 }
 
+/* 
+   STEP 6: WIN/LOSS CONDITION & REPORTING
+   Why: At the end of the game, we evaluate the player's final state 
+   to determine their "Ending"[cite: 3].
+*/
 void endGameReport(Player p) {
     string result;
     if (p.health <= 0) result = "PERISHED";
@@ -301,13 +333,19 @@ void endGameReport(Player p) {
     }
 }
 
+/* 
+   STEP 7: THE CORE GAME LOOP
+   This manages the overall flow of the program, from naming the player 
+   to the menu system, and finally the "Play Again" cycle[cite: 3].
+*/
 int main() {
-    srand(static_cast<unsigned int>(time(0)));
+    srand(static_cast<unsigned int>(time(0))); // Seeding the random number generator
     Player explorer;
     int choice;
     bool playAgain;
 
     do {
+        // Resetting state for a fresh game[cite: 3]
         explorer.health = 100; explorer.knowledge = 0; explorer.roomsExplored = 0; explorer.isAlive = true;
         for (int i = 0; i < 5; i++) explorer.encountered[i] = false;
 

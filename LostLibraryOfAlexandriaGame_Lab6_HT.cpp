@@ -1,15 +1,13 @@
-#include <iostream> // Handles standard input and output (cin/cout)
-#include <string>   // Allows us to use the string data type for names and narrative text
-#include <fstream>  // Gives us the ability to read from and write to external files
-#include <cstdlib>  // Contains functions like rand() and srand() for randomization
-#include <ctime>    // Used to get the system time for a truly random seed
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <cstdlib> // Including for functions srand() function
+#include <ctime>   // Used to get the system time for a random seed for the game
 
 using namespace std;
 
-// --- STEP 1: THE PLAYER BLUEPRINT ---
-// We use a struct to group different data types (strings, ints, bools)
-// together into one "Player" object. This is much cleaner than passing
-// six separate variables into every function.
+// Using a struct to group different data types together into one "Player" object.
+// This avoids having to pass six separate variables into every function.
 struct Player
 {
     string name;
@@ -20,9 +18,8 @@ struct Player
     bool encountered[5]; // An array of booleans to track which special encounters the player has seen
 };
 
-// --- Function Prototypes ---
-// These tell the compiler "these functions exist, but I'll define the details later".
-// This allows us to call functions before their definitions in the code.
+// Function Prototypes
+// Adding these prototypes to prevent "implicit declaration" errors since the functions are defined after main()
 void viewStats(Player p);
 void exploreRoom(Player &p);
 void handleRandomEncounter(Player &p);
@@ -31,14 +28,9 @@ void loadGame(Player &p);
 void endGameReport(Player p);
 int getValidChoice(int min, int max);
 
-// --- Implementation ---
 
-/*
-   STEP 2: INPUT VALIDATION (THE "FIREWALL")
-   Why: If a user types "abc" when the program expects a number, C++ can enter
-   an infinite loop error state. This function prevents that by clearing
-   the error and forcing the user to pick a valid number.
-*/
+// Input validator function to ensure valid menu choices within min-max range.
+// Handles invalid inputs to prevent program errors.
 int getValidChoice(int min, int max)
 {
     int choice;
@@ -46,12 +38,15 @@ int getValidChoice(int min, int max)
     {
         if (cin >> choice && choice >= min && choice <= max)
         {
-            cin.ignore(1000, '\n'); // Clear the rest of the line to prevent leftover input from causing issues in future inputs
+            // Clear the rest of the line to prevent leftover input from causing issues in future inputs
+            cin.ignore(1000, '\n');
             return choice;
         }
         cout << " [!] Invalid entry. Please enter a choice between " << min << " and " << max << ": ";
-        cin.clear();            // Reset the error flag on the input stream to recover from invalid input
-        cin.ignore(1000, '\n'); // Discard the invalid characters in the buffer to clean the input stream
+        // Reset the error flag on the input stream to recover from invalid input
+        cin.clear();
+        // Discard the invalid characters in the buffer to clean the input stream
+        cin.ignore(1000, '\n');
     }
 }
 
@@ -66,12 +61,7 @@ void viewStats(Player p)
     cout << "--------------------" << endl;
 }
 
-/*
-   STEP 3: UNIQUE EVENT LOGIC
-   Why: We don't want the player to see the same "Special Encounter" twice.
-   How: We look through the 'encountered' array to find which events are still 'false',
-   put those indexes into a temporary 'available' array, and pick from that.
-*/
+// Function to handle unique random encounters, ensuring no repeats.
 void handleRandomEncounter(Player &p)
 {
     int available[5];
@@ -94,7 +84,8 @@ void handleRandomEncounter(Player &p)
     }
 
     int pick = available[rand() % count];
-    p.encountered[pick] = true; // Mark this specific encounter as "completed"
+    // Mark this specific encounter as "completed"
+    p.encountered[pick] = true;
     int choice;
 
     cout << "\n [???] SPECIAL ENCOUNTER [???]" << endl;
@@ -228,16 +219,12 @@ void handleRandomEncounter(Player &p)
         break;
     }
     cout << endl;
+    // Ensures health never exceeds the 100-point maximum
     if (p.health > 100)
-        p.health = 100; // Ensures health never exceeds the 100-point maximum
+        p.health = 100;
 }
 
-/*
-   STEP 4: PROCEDURAL NARRATIVE
-   Why: This makes the library feel infinite without writing infinite code.
-   How: By using arrays of strings, we can randomly select one out of ten
-   descriptions every time the player "Explores".
-*/
+// Function to explore a room, generating random events using arrays of descriptions.
 void exploreRoom(Player &p)
 {
     p.roomsExplored++;
@@ -307,11 +294,7 @@ void exploreRoom(Player &p)
         p.isAlive = false;
 }
 
-/*
-   STEP 5: DATA PERSISTENCE (SAVE/LOAD)
-   How: We use ofstream (output file stream) and ifstream (input file stream)
-   to write the struct data to a plain text file on the hard drive.
-*/
+// Function to save game state to a text file.
 void saveGame(Player p)
 {
     ofstream outFile("SaveGame.txt");
@@ -329,12 +312,14 @@ void saveGame(Player p)
     }
 }
 
+// Function to load game state from a text file.
 void loadGame(Player &p)
 {
     ifstream inFile("SaveGame.txt");
     if (inFile.is_open())
     {
-        getline(inFile, p.name); // Read the name which may contain spaces
+        // Read the name which may contain spaces
+        getline(inFile, p.name);
         inFile >> p.health >> p.knowledge >> p.roomsExplored;
         // Load the encountered array from space-separated booleans
         for (int i = 0; i < 5; i++)
@@ -346,11 +331,7 @@ void loadGame(Player &p)
         cout << " No SaveGame.txt found." << endl;
 }
 
-/*
-   STEP 6: WIN/LOSS CONDITION & REPORTING
-   Why: At the end of the game, we evaluate the player's final state
-   to determine their "Ending".
-*/
+// Function to display final game report and save to file.
 void endGameReport(Player p)
 {
     string result;
@@ -382,11 +363,7 @@ void endGameReport(Player p)
     }
 }
 
-/*
-   STEP 7: THE CORE GAME LOOP
-   This manages the overall flow of the program, from naming the player
-   to the menu system, and finally the "Play Again" cycle.
-*/
+// Main function managing the game loop, including setup and replay.
 int main()
 {
     // Seed the RNG using the current time
@@ -419,7 +396,8 @@ int main()
         cout << "Will you make it out alive or will the library add another victim within it's walls?" << endl
              << endl;
         cout << "Name: ";
-        getline(cin, explorer.name); // Use getline to allow names with spaces
+        // Use getline to allow names with spaces
+        getline(cin, explorer.name);
 
         bool exitFlag = false;
         while (explorer.isAlive && !exitFlag)
@@ -447,7 +425,8 @@ int main()
         cout << "Play again? (y/n): ";
         char resp;
         cin >> resp;
-        cin.ignore(1000, '\n'); // Clear the newline left by cin >> resp
+        // Clear the newline left by cin >> resp
+        cin.ignore(1000, '\n');
         playAgain = (resp == 'y' || resp == 'Y');
     } while (playAgain);
 

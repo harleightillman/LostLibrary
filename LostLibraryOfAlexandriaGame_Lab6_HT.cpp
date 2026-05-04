@@ -22,6 +22,7 @@ struct Player
 
 // --- Function Prototypes ---
 // These tell the compiler "these functions exist, but I'll define the details later".
+// This allows us to call functions before their definitions in the code.
 void viewStats(Player p);
 void exploreRoom(Player &p);
 void handleRandomEncounter(Player &p);
@@ -45,17 +46,18 @@ int getValidChoice(int min, int max)
     {
         if (cin >> choice && choice >= min && choice <= max)
         {
-            cin.ignore(1000, '\n'); // Clear the rest of the line
+            cin.ignore(1000, '\n'); // Clear the rest of the line to prevent leftover input from causing issues in future inputs
             return choice;
         }
         cout << " [!] Invalid entry. Please enter a choice between " << min << " and " << max << ": ";
-        cin.clear();            // Reset the error flag on the input stream
-        cin.ignore(1000, '\n'); // Discard the invalid characters in the buffer
+        cin.clear();            // Reset the error flag on the input stream to recover from invalid input
+        cin.ignore(1000, '\n'); // Discard the invalid characters in the buffer to clean the input stream
     }
 }
 
 void viewStats(Player p)
 {
+    // Display the player's current statistics in a formatted way
     cout << "\n--- PLAYER STATS ---" << endl;
     cout << " Name:           " << p.name << endl;
     cout << " Health:         " << p.health << endl;
@@ -75,6 +77,7 @@ void handleRandomEncounter(Player &p)
     int available[5];
     int count = 0;
 
+    // Build a list of unencountered events
     for (int i = 0; i < 5; i++)
     {
         if (!p.encountered[i])
@@ -318,6 +321,7 @@ void saveGame(Player p)
                 << p.health << endl
                 << p.knowledge << endl
                 << p.roomsExplored << endl;
+        // Save the encountered array as space-separated booleans
         for (int i = 0; i < 5; i++)
             outFile << p.encountered[i] << " ";
         outFile.close();
@@ -330,8 +334,9 @@ void loadGame(Player &p)
     ifstream inFile("SaveGame.txt");
     if (inFile.is_open())
     {
-        getline(inFile, p.name);
+        getline(inFile, p.name); // Read the name which may contain spaces
         inFile >> p.health >> p.knowledge >> p.roomsExplored;
+        // Load the encountered array from space-separated booleans
         for (int i = 0; i < 5; i++)
             inFile >> p.encountered[i];
         inFile.close();
@@ -414,7 +419,7 @@ int main()
         cout << "Will you make it out alive or will the library add another victim within it's walls?" << endl
              << endl;
         cout << "Name: ";
-        getline(cin, explorer.name);
+        getline(cin, explorer.name); // Use getline to allow names with spaces
 
         bool exitFlag = false;
         while (explorer.isAlive && !exitFlag)
@@ -442,7 +447,7 @@ int main()
         cout << "Play again? (y/n): ";
         char resp;
         cin >> resp;
-        cin.ignore(1000, '\n');
+        cin.ignore(1000, '\n'); // Clear the newline left by cin >> resp
         playAgain = (resp == 'y' || resp == 'Y');
     } while (playAgain);
 

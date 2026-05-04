@@ -1,0 +1,6 @@
+--- EXPEDITION LOG: Harleigh ---
+Rooms Explored:  5
+Final Health:    70
+Total Knowledge: 25
+Status:          LEFT EARLY
+-----------------------------------

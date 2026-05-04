@@ -192,42 +192,42 @@ void handleRandomEncounter(Player& p) {
 void exploreRoom(Player& p) {
     p.roomsExplored++;
 
-    // Generalized events (10 scenarios each)
+    // Generalized events (10 scenarios each) - Expanded with more narrative detail[cite: 3]
     string danger_event[] = {
-        "Click! A pressure plate triggers poison-tipped darts from the stone walls.",
-        "The floor gives way, dropping you into a pit filled with jagged pottery shards.",
-        "A massive, dust-caked bookshelf groans and topples over, nearly pinning you.",
-        "A tripwire snaps, releasing a swinging pendulum blade that grazes your shoulder.",
-        "A stone block drops from the ceiling, sending debris flying into your path.",
-        "A hidden nozzle sprays a cloud of caustic, stinging vapor into your face.",
-        "You inhale toxic spores from a patch of ancient, pulsating mold on the wall.",
-        "A rotted pipe bursts, flooding the narrow corridor with freezing, murky water.",
-        "A swarm of library-dwelling scarabs emerges from a crack, biting your ankles.",
-        "You step on an unstable floor tile, causing a painful twist in your ankle."
+        "You hear a sharp metallic click as your boot depresses a stone tile. A barrage of poison-tipped darts whistles through the air from hidden slits, grazing your skin.",
+        "The stone floor beneath you suddenly groans and vanishes into darkness. You tumble into a shallow pit lined with jagged pottery shards that tear into your gear and skin.",
+        "A massive, dust-caked bookshelf shifts and topples with a thunderous roar. You barely roll aside as it crashes, but a heavy wooden beam strikes your shoulder.",
+        "A nearly invisible tripwire snaps across your path. A rusted pendulum blade swings from the ceiling, its serrated edge slicing through your clothes and leaving a stinging wound.",
+        "As you pass under a crumbling arch, a massive stone block detaches and plummets. The resulting shockwave and debris spray you with sharp, stinging stone fragments.",
+        "A hiss fills the air as a hidden nozzle sprays a thick, caustic vapor. The stinging mist burns your eyes and throat, forcing you to stagger back in pain.",
+        "You disturb a patch of pulsating, iridescent mold on a damp wall. A cloud of toxic spores erupts, choking you and leaving you lightheaded and nauseous.",
+        "A rotted lead pipe overhead bursts under pressure, drenching you in freezing, murky water. The sudden shock and weight of the water knock you flat against the floor.",
+        "Thousands of tiny library-dwelling scarabs pour from a crack in the masonry. They swarm your legs, their needle-like mandibles biting through your boots and causing sharp pain.",
+        "You step on an uneven marble tile that suddenly tilts. Your foot slips into a gap, twisting your ankle painfully and forcing you to limp for several minutes."
     };
     string knowledge_event[] = {
-        "You unfurl a brittle papyrus detailing complex celestial movements.",
-        "You find a well-preserved ledger recording the daily lives of ancient scholars.",
-        "A tightly wound scroll reveals a hidden map of the library's lower catacombs.",
-        "You decipher philosophical meditations written by a lost sage.",
-        "A fragment of a medical treatise describes rare surgical techniques.",
-        "You find an architectural blueprint revealing the intent behind the library.",
-        "You overhear a lingering echo of an ancient lecture bouncing off the stone walls.",
-        "You spend time observing a complex, gold-plated orrery's rhythmic movements.",
-        "You translate a weathered wall frieze that depicts the rise of the Great Library.",
-        "You find a cache of rare linguistic dictionaries that broaden your understanding."
+        "You unfurl a brittle papyrus that crackles like dry leaves. It contains intricate diagrams detailing the celestial movements once used by master ancient navigators.",
+        "Buried under debris, you find a leather-bound ledger. It provides a minute-by-minute account of the daily lives and rations of the library’s original scholars.",
+        "You pull a tightly wound scroll from a hidden niche. As it unrolls, it reveals a meticulously drawn map of the library's lower catacombs and forgotten vaults.",
+        "You spend a few quiet moments deciphering a set of philosophical meditations. The sage's words on the nature of truth provide you with a sudden, profound clarity.",
+        "A fragment of a medical treatise lies open on a stone table. You study detailed illustrations of rare surgical techniques once used by master Ptolemaic physicians.",
+        "You discover a large architectural blueprint pinned to a wall. Its lines reveal the grand intent behind the library’s design and the location of ceremonial halls.",
+        "The stone walls seem to hold the past. You stand perfectly still as a lingering echo of an ancient lecture on rhetoric bounces through the corridor, filling your mind.",
+        "You come across a gold-plated orrery that still ticks. By observing its rhythmic, mechanical movements, you gain a deep understanding of the ancient world's timekeeping.",
+        "A weathered wall frieze catches your eye. You carefully translate the carved glyphs, which tell the epic story of the library’s founding and its most famous scholars.",
+        "You stumble upon a hidden cache of rare linguistic dictionaries. Comparing the scripts allows you to connect several dead languages, broadening your understanding."
     };
     string health_event[] = {
-        "You discover a jar of dried aloe vera paste that mends your minor scrapes.",
-        "A cluster of glowing blue berries grows in a damp corner; they are restorative.",
-        "The scent of ancient, burning incense lingers, calming your spirit.",
-        "You find a bundle of medicinal herbs that act as a potent healing agent.",
-        "A small vial of honey-like resin is tucked away, closing deep wounds.",
-        "You come across a patch of silver-leafed mint that clears your head.",
-        "You find a small marble basin filled with cool, purified rainwater.",
-        "You take a brief rest on a sun-drenched stone bench beneath a high window.",
-        "A lingering blessing from a scholar's shrine fills you with renewed vitality.",
-        "A crisp draft of fresh air from a high vent restores your stamina."
+        "Tucked inside a wall alcove is a jar of dried aloe vera paste. You apply the cool salve to your minor scrapes, watching as the redness and stinging pain subside.",
+        "A cluster of glowing blue berries grows in a damp, shadowy corner. You find them surprisingly sweet and restorative, feeling a surge of physical energy with every bite.",
+        "The faint scent of ancient, burning incense still clings to the air near a small shrine. Breathing deeply, you feel your racing heart slow and your spirit begin to mend.",
+        "You find a neatly tied bundle of medicinal herbs. Though they taste incredibly bitter, chewing them acts as a potent healing agent that closes your smaller wounds.",
+        "A small, airtight vial of honey-like resin is hidden beneath a loose brick. Applying a drop to your deeper cuts seems to stabilize them and restore your strength.",
+        "You find a patch of silver-leafed mint growing near a water leak. Rubbing the leaves between your fingers clears your head and eases your physical toll.",
+        "A small marble basin catches a steady drip of purified rainwater from a ceiling crack. Drinking the cool, clear water refreshes you and washes away the grime.",
+        "You take a brief rest on a sun-drenched stone bench beneath a high, narrow window. The warmth of the light seeps into your bones, easing your deep exhaustion.",
+        "As you pass a neglected scholar's shrine, a lingering blessing seems to radiate from the stone. A sense of renewed vitality and physical peace washes over you.",
+        "A sudden, crisp draft of fresh air flows down from a high ventilation shaft. Inhaling the clean breeze restores your stamina and clears the dust from your lungs."
     };
 
     int event = rand() % 4 + 1;

@@ -11,9 +11,9 @@ struct Player {
     string name;
     int health;
     int knowledge;
-    int roomsExplored; // Tracked for final report[cite: 1]
+    int roomsExplored;
     bool isAlive;
-    bool encountered[5]; // Ensures unique random encounters[cite: 2]
+    bool encountered[5];
 };
 
 // --- Function Prototypes ---
@@ -39,7 +39,6 @@ void handleRandomEncounter(Player& p) {
     int available[5];
     int count = 0;
 
-    // Filter for encounters not yet seen[cite: 2]
     for (int i = 0; i < 5; i++) {
         if (!p.encountered[i]) {
             available[count] = i;
@@ -48,7 +47,7 @@ void handleRandomEncounter(Player& p) {
     }
 
     if (count == 0) {
-        cout << "\n [!] You feel a sense of deja vu. This part of the library is familiar." << endl;
+        cout << "\n [!] You feel a sense of déjà vu. This part of the library is familiar." << endl;
         return;
     }
 
@@ -58,7 +57,6 @@ void handleRandomEncounter(Player& p) {
 
     cout << "\n [???] UNIQUE ENCOUNTER [???]" << endl;
 
-    // Scenarios based on user input
     switch (pick) {
     case 0: // Scriptorium's Whisper
         cout << "A voice promises a secret from a cracked codex.\n 1. Read aloud\n 2. Pocket a folio\n 3. Leave it\n Choice: ";
@@ -98,7 +96,7 @@ void handleRandomEncounter(Player& p) {
     }
     cout << endl;
     if (p.health > 100) p.health = 100;
-    cin.ignore(1000, '\n'); // Buffer fix[cite: 2]
+    cin.ignore(1000, '\n');
 }
 
 void exploreRoom(Player& p) {
@@ -107,7 +105,7 @@ void exploreRoom(Player& p) {
     string scrolls[] = { "You find a star map.", "You read a lost history.", "A scroll reveals a secret." };
     string herbs[] = { "You find dried aloe.", "You eat a blue berry.", "Soothing incense heals you." };
 
-    int event = rand() % 4 + 1; // 1-3 standard, 4 random encounter[cite: 2]
+    int event = rand() % 4 + 1;
 
     if (event == 1) {
         cout << "\n [!] " << traps[rand() % 3] << " Health -15." << endl;
@@ -130,18 +128,20 @@ void exploreRoom(Player& p) {
     if (p.health <= 0) p.isAlive = false;
 }
 
+// Updated to use "SaveGame.txt"
 void saveGame(Player p) {
-    ofstream outFile("savegame.txt");
+    ofstream outFile("SaveGame.txt");
     if (outFile.is_open()) {
         outFile << p.name << endl << p.health << endl << p.knowledge << endl << p.roomsExplored << endl;
         for (int i = 0; i < 5; i++) outFile << p.encountered[i] << " ";
         outFile.close();
-        cout << " Game saved." << endl;
+        cout << " Game saved to SaveGame.txt" << endl;
     }
 }
 
+// Updated to use "SaveGame.txt"
 void loadGame(Player& p) {
-    ifstream inFile("savegame.txt");
+    ifstream inFile("SaveGame.txt");
     if (inFile.is_open()) {
         getline(inFile, p.name);
         inFile >> p.health >> p.knowledge >> p.roomsExplored;
@@ -149,17 +149,36 @@ void loadGame(Player& p) {
         inFile.close();
         cout << " Game loaded! Welcome, " << p.name << "." << endl;
     }
-    else cout << " No save found." << endl;
+    else cout << " No SaveGame.txt found." << endl;
 }
 
+// Generates Final_Results.txt
 void endGameReport(Player p) {
+    string result;
+    if (p.health <= 0) result = "PERISHED";
+    else if (p.knowledge >= 50) result = "ESCAPED WITH SECRETS";
+    else result = "LEFT EARLY";
+
+    // Show on Screen
     cout << "\n--- FINAL REPORT ---" << endl;
+    cout << " Explorer:        " << p.name << endl;
     cout << " Rooms Explored:  " << p.roomsExplored << endl;
     cout << " Final Health:    " << p.health << endl;
     cout << " Total Knowledge: " << p.knowledge << endl;
-    if (p.health <= 0) cout << " Result: PERISHED" << endl;
-    else if (p.knowledge >= 50) cout << " Result: ESCAPED WITH SECRETS" << endl;
-    else cout << " Result: LEFT EARLY" << endl;
+    cout << " Result:          " << result << endl;
+
+    // Save to File
+    ofstream reportFile("Final_Results.txt");
+    if (reportFile.is_open()) {
+        reportFile << "--- EXPEDITION LOG: " << p.name << " ---" << endl;
+        reportFile << "Rooms Explored:  " << p.roomsExplored << endl;
+        reportFile << "Final Health:    " << p.health << endl;
+        reportFile << "Total Knowledge: " << p.knowledge << endl;
+        reportFile << "Status:          " << result << endl;
+        reportFile << "-----------------------------------" << endl;
+        reportFile.close();
+        cout << "\n[!] Results exported to Final_Results.txt" << endl;
+    }
 }
 
 int main() {

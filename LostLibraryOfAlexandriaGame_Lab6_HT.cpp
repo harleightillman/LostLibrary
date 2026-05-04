@@ -192,43 +192,56 @@ void handleRandomEncounter(Player& p) {
 void exploreRoom(Player& p) {
     p.roomsExplored++;
 
-    string traps[] = {
+    // Generalized events (10 scenarios each)
+    string danger_event[] = {
         "Click! A pressure plate triggers poison-tipped darts from the stone walls.",
         "The floor gives way, dropping you into a pit filled with jagged pottery shards.",
         "A massive, dust-caked bookshelf groans and topples over, nearly pinning you.",
         "A tripwire snaps, releasing a swinging pendulum blade that grazes your shoulder.",
         "A stone block drops from the ceiling, sending debris flying into your path.",
-        "A hidden nozzle sprays a cloud of caustic, stinging vapor into your face."
+        "A hidden nozzle sprays a cloud of caustic, stinging vapor into your face.",
+        "You inhale toxic spores from a patch of ancient, pulsating mold on the wall.",
+        "A rotted pipe bursts, flooding the narrow corridor with freezing, murky water.",
+        "A swarm of library-dwelling scarabs emerges from a crack, biting your ankles.",
+        "You step on an unstable floor tile, causing a painful twist in your ankle."
     };
-    string scrolls[] = {
+    string knowledge_event[] = {
         "You unfurl a brittle papyrus detailing complex celestial movements.",
         "You find a well-preserved ledger recording the daily lives of ancient scholars.",
         "A tightly wound scroll reveals a hidden map of the library's lower catacombs.",
         "You decipher philosophical meditations written by a lost sage.",
         "A fragment of a medical treatise describes rare surgical techniques.",
-        "You find an architectural blueprint revealing the intent behind the library."
+        "You find an architectural blueprint revealing the intent behind the library.",
+        "You overhear a lingering echo of an ancient lecture bouncing off the stone walls.",
+        "You spend time observing a complex, gold-plated orrery's rhythmic movements.",
+        "You translate a weathered wall frieze that depicts the rise of the Great Library.",
+        "You find a cache of rare linguistic dictionaries that broaden your understanding."
     };
-    string herbs[] = {
+    string health_event[] = {
         "You discover a jar of dried aloe vera paste that mends your minor scrapes.",
         "A cluster of glowing blue berries grows in a damp corner; they are restorative.",
         "The scent of ancient, burning incense lingers, calming your spirit.",
         "You find a bundle of medicinal herbs that act as a potent healing agent.",
         "A small vial of honey-like resin is tucked away, closing deep wounds.",
-        "You come across a patch of silver-leafed mint that clears your head."
+        "You come across a patch of silver-leafed mint that clears your head.",
+        "You find a small marble basin filled with cool, purified rainwater.",
+        "You take a brief rest on a sun-drenched stone bench beneath a high window.",
+        "A lingering blessing from a scholar's shrine fills you with renewed vitality.",
+        "A crisp draft of fresh air from a high vent restores your stamina."
     };
 
     int event = rand() % 4 + 1;
 
     if (event == 1) {
-        cout << "\n [!] " << traps[rand() % 6] << " Health -15." << endl;
+        cout << "\n [!] " << danger_event[rand() % 10] << " Health -15." << endl;
         p.health -= 15;
     }
     else if (event == 2) {
-        cout << "\n [+] " << scrolls[rand() % 6] << " Knowledge +10." << endl;
+        cout << "\n [+] " << knowledge_event[rand() % 10] << " Knowledge +10." << endl;
         p.knowledge += 10;
     }
     else if (event == 3) {
-        cout << "\n [+] " << herbs[rand() % 6] << " Health +10." << endl;
+        cout << "\n [+] " << health_event[rand() % 10] << " Health +10." << endl;
         p.health += 10;
         if (p.health > 100) p.health = 100;
     }
